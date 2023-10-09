@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="22154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="22130"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--View Controller-->
+        <scene sceneID="tne-QT-ifu">
+            <objects>
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CatchTheAnimal" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="51S-OJ-Sgz">
+                                <rect key="frame" x="31" y="279" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="jGx-yN-TnB">
+                                <rect key="frame" x="114" y="279" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="4Ft-iZ-CLv">
+                                <rect key="frame" x="196" y="279" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="FgX-Ea-qGD">
+                                <rect key="frame" x="279" y="279" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="4NQ-rK-db0">
+                                <rect key="frame" x="31" y="359" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="cYy-bW-cs7">
+                                <rect key="frame" x="114" y="359" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="o2B-Zc-fQj">
+                                <rect key="frame" x="196" y="359" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="MC9-3n-duC">
+                                <rect key="frame" x="279" y="359" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="EO2-rj-9XK">
+                                <rect key="frame" x="31" y="438" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="9EB-sC-2TS">
+                                <rect key="frame" x="114" y="438" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="11k-3a-8F8">
+                                <rect key="frame" x="196" y="438" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="jGx-yy-Zjm">
+                                <rect key="frame" x="279" y="438" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="vCx-Gm-UHE">
+                                <rect key="frame" x="31" y="518" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="7nP-DJ-Qym">
+                                <rect key="frame" x="114" y="518" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="gOH-uP-y09">
+                                <rect key="frame" x="196" y="518" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" image="GSLD" translatesAutoresizingMaskIntoConstraints="NO" id="zVf-QI-H2D">
+                                <rect key="frame" x="279" y="518" width="82" height="82"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Time: 30" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8lm-r3-7Ej">
+                                <rect key="frame" x="127" y="173" width="138" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="26"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Score: 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Tfg-XK-krE">
+                                <rect key="frame" x="127" y="219" width="138" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Highest Score: 0" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="0Jr-fl-BOz">
+                                <rect key="frame" x="127" y="641" width="138" height="38"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                    <connections>
+                        <outlet property="gsLady1" destination="51S-OJ-Sgz" id="2yv-fT-IX5"/>
+                        <outlet property="gsLady10" destination="9EB-sC-2TS" id="CGJ-OO-O9i"/>
+                        <outlet property="gsLady11" destination="11k-3a-8F8" id="6On-Dn-FLv"/>
+                        <outlet property="gsLady12" destination="jGx-yy-Zjm" id="3uq-QT-wsM"/>
+                        <outlet property="gsLady13" destination="vCx-Gm-UHE" id="cfP-wx-Axv"/>
+                        <outlet property="gsLady14" destination="7nP-DJ-Qym" id="2L3-68-2I6"/>
+                        <outlet property="gsLady15" destination="gOH-uP-y09" id="hGC-NU-dad"/>
+                        <outlet property="gsLady16" destination="zVf-QI-H2D" id="cuO-cB-CE5"/>
+                        <outlet property="gsLady2" destination="jGx-yN-TnB" id="dph-G3-jmV"/>
+                        <outlet property="gsLady3" destination="4Ft-iZ-CLv" id="rnJ-M0-1OV"/>
+                        <outlet property="gsLady4" destination="FgX-Ea-qGD" id="Y15-fI-3Xd"/>
+                        <outlet property="gsLady5" destination="4NQ-rK-db0" id="Kdc-jN-XWH"/>
+                        <outlet property="gsLady6" destination="cYy-bW-cs7" id="i91-vF-qXr"/>
+                        <outlet property="gsLady7" destination="o2B-Zc-fQj" id="opI-pn-V0v"/>
+                        <outlet property="gsLady8" destination="MC9-3n-duC" id="vkq-2l-ZxM"/>
+                        <outlet property="gsLady9" destination="EO2-rj-9XK" id="vAa-Gm-wbE"/>
+                        <outlet property="highScoreLabel" destination="0Jr-fl-BOz" id="vuc-br-Ruv"/>
+                        <outlet property="scoreLabel" destination="Tfg-XK-krE" id="4JZ-RH-Taj"/>
+                        <outlet property="timeLabel" destination="8lm-r3-7Ej" id="MDt-y8-Wtw"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="46.564885496183201" y="-2.1126760563380285"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="GSLD" width="362" height="360"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>
