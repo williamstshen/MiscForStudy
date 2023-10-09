@@ -2,7 +2,7 @@
 //  ViewController.swift
 //  CatchTheAnimal
 //
-//  Created by Elaina mayo on 2023/10/9.
+//  Created by William on 2023/10/9.
 //
 
 import UIKit
@@ -10,6 +10,12 @@ import UIKit
 class ViewController: UIViewController {
     
     var score = 0
+    var timer = Timer()
+    var hideTimer = Timer()
+    var counter = 0
+    var highScore = 0
+    
+    var gsLadyArray = [UIImageView]()
     
     @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var scoreLabel: UILabel!
@@ -52,6 +58,17 @@ class ViewController: UIViewController {
         gsLady16.isUserInteractionEnabled = true
         
         scoreLabel.text = "Score: \(score)"
+        let storedHighestScore = UserDefaults.standard.object(forKey: "highest_score")
+        if storedHighestScore == nil {
+            highScore = 0
+            highScoreLabel.text = "Highest Score: \(highScore)"
+        }
+        if let newScore = storedHighestScore as? Int {
+            highScore = newScore
+            highScoreLabel.text = "Highest Score: \(highScore)"
+        }
+        
+        
         let recgr1 = UITapGestureRecognizer(target: self, action: #selector(increaseScore))
         let recgr2 = UITapGestureRecognizer(target: self, action: #selector(increaseScore))
         let recgr3 = UITapGestureRecognizer(target: self, action: #selector(increaseScore))
@@ -86,11 +103,76 @@ class ViewController: UIViewController {
         gsLady15.addGestureRecognizer(recgr15)
         gsLady16.addGestureRecognizer(recgr16)
         
+        gsLadyArray = [gsLady1, gsLady2, gsLady3, gsLady4,
+                       gsLady5, gsLady6, gsLady7, gsLady8,
+                       gsLady9, gsLady10, gsLady11, gsLady12,
+                       gsLady13, gsLady14, gsLady15, gsLady16,
+        ]
+        
+        counter = 15
+        timeLabel.text = "Time: \(counter)s"
+        timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(countDown), userInfo: nil, repeats: true)
+        hideTimer = Timer.scheduledTimer(timeInterval: 0.8, target: self, selector: #selector(gsLadyHidden), userInfo: nil, repeats: true)
+        
+        
+    }
+    
+    @objc func gsLadyHidden() {
+        for gslady in gsLadyArray {
+            // hidden also means cannot catch tap gestures
+            gslady.isHidden = true
+        }
+        
+        let random_n = Int(arc4random_uniform(UInt32(gsLadyArray.count - 1)))
+        gsLadyArray[random_n].isHidden = false
     }
     
     @objc func increaseScore() {
         score += 1
         scoreLabel.text = "Score: \(score)"
+    }
+    
+    @objc func countDown() {
+        counter -= 1
+        timeLabel.text = "Time: \(counter)s"
+        
+        if counter == 0 {
+            timer.invalidate()
+            hideTimer.invalidate()
+            
+            if self.score > self.highScore {
+                self.highScore = self.score
+                self.highScoreLabel.text = "Highest Score: \(self.highScore)"
+                UserDefaults.standard.set(self.highScore, forKey: "highest_score")
+            }
+            
+            // send alert to player
+            let alert = UIAlertController(title: "Time's Up", message: "Play Again?", preferredStyle: UIAlertController.Style.alert)
+            let rpButton = UIAlertAction(title: "Replay", style: UIAlertAction.Style.default) { [self]
+                (UIAlertAction) in
+                // replay func
+                // [WS] in closure func, need self to access correct global vars
+                print("DBG : \(self.score)")
+                self.score = 0
+                self.scoreLabel.text = "Score: \(self.score)"
+                self.counter = 15
+                self.timeLabel.text = "Time: \(self.counter)s"
+                self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.countDown), userInfo: nil, repeats: true)
+                self.hideTimer = Timer.scheduledTimer(timeInterval: 0.8, target: self, selector: #selector(self.gsLadyHidden), userInfo: nil, repeats: true)
+                
+                
+            }
+            let noButton = UIAlertAction(title: "NO", style: UIAlertAction.Style.cancel, handler: nil)
+            
+            alert.addAction(rpButton)
+            alert.addAction(noButton)
+            
+            self.present(alert, animated: true, completion: nil)
+            
+            
+            
+            
+        }
     }
 
 
