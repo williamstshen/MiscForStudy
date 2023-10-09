@@ -4,6 +4,10 @@
 //
 //  Created by William on 2023/10/9.
 //
+//  2023.10.09 : to try add function :
+//      (1) slider instead of tap
+//      (2) add buttons for "start" and "clear highest score"
+//      (3) change hand code vars to arrays 
 
 import UIKit
 
