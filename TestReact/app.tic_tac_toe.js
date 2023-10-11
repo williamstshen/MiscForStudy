@@ -1,3 +1,7 @@
+// Reference from :
+// https://react.dev/learn/tutorial-tic-tac-toe
+// and modify as CDN import style instead of Node env
+
 // import { useState } from 'react';
 const useState = React.useState;
 
