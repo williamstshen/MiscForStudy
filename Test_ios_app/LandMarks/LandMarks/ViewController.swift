@@ -86,5 +86,17 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
             
         }
     }
+    
+    //[WS] monitor swipe gesture (?)
+    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            self.landmarkNames.remove(at: indexPath.row)
+            self.landmarkImages.remove(at: indexPath.row)
+            self.landmarkDescription.remove(at: indexPath.row)
+            //[WS] not recommended because if thoulands data need to reload
+            // tableView.reloadData()
+            tableView.deleteRows(at:[indexPath], with: .fade)
+        }
+    }
 }
 
