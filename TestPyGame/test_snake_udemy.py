@@ -1,6 +1,11 @@
 import pygame, sys, random, time
 from enum import Enum 
 
+import random
+import numpy as np
+import tensorflow as tf
+
+
 check_errors = pygame.init()
 
 # sington : global used const parameter
@@ -30,6 +35,8 @@ class PARAM:
     BLACK_COLOR = pygame.Color(0, 10, 0)
     WHITE_COLOR = pygame.Color(255, 255, 255)
     BROWN_COLOR = pygame.Color(165, 42, 42)
+
+    N_GAME_CREATE = 100
 
 #####
 ##### game main Class include UI
@@ -178,9 +185,9 @@ class snakeGame:
         else :
             self.snakeBody.pop()
 
-    def is_collision(self):
+    def is_collision(self, snakeHead):
         result = False
-        snakeHead = self.snakeBody[0]
+        #snakeHead = self.snakeBody[0]
         if snakeHead in self.snakeBody[1:]:
             result = True
         if (snakeHead[0] > PARAM.WIN_X) | (snakeHead[0] < 0):
@@ -191,9 +198,88 @@ class snakeGame:
 
 #####
 ##### Reinforcement Learning related model and tran definition
+##### instead of Youtube RL with torch for snake, here to try using Keras
 ##### 
+class Agent:
+    def __init__(self):
+        self.n_games = 0
+        self.epsilon = PARAM.N_GAME_CREATE
+        self.model = Linear_QNet()
+        self.trainer = QTrainer()
 
+    
+    def get_state(self, p_snake_game):
+        # to return state value as below
+        # [danger_straight, danger_turn_right, danger_turn_left,
+        #  direct_right, direct_down, direct_left, direct_up,
+        #  food_right, food_down, food_left, food_up]
+        # danger_* is multi-value
+        # direct_* is one-hot
+        # food* is multi-value (1 or 2 values)
 
+        head = p_snake_game.snakeBody[0]
+        food = p_snake_game.foodPos
+        # init value
+        danger_straight, danger_turn_r, danger_turn_l = (0, 0, 0)
+        direct_r, direct_d, direct_l, direct_u = (0, 0, 0, 0)
+        food_r, food_d, food_l, food_u = (0, 0, 0, 0)
+        
+        direct_r = 1 if (p_snake_game.snakeDirect == Direct.RIGHT) else 0
+        direct_d = 1 if (p_snake_game.snakeDirect == Direct.DOWN) else 0
+        direct_l = 1 if (p_snake_game.snakeDirect == Direct.LEFT) else 0
+        direct_u = 1 if (p_snake_game.snakeDirect == Direct.UP) else 0
+
+        straight_head = [head[0] + direct_r*PARAM.GRID - direct_l*PARAM.GRID, 
+                         head[1] + direct_d*PARAM.GRID - direct_u*PARAM.GRID] 
+        danger_straight = p_snake_game.is_collision(straight_head)
+        
+        # up->right or down->left for x
+        # right->down or left->up for y
+        turn_right_head = [head[0] + direct_u*PARAM.GRID - direct_d*PARAM.GRID, 
+                           head[1] + direct_r*PARAM.GRID - direct_l*PARAM.GRID] 
+        danger_turn_r = p_snake_game.is_collision(turn_right_head)
+
+        # up->left or down->right for x
+        # right->up or left->down for y
+        turn_left_head = [head[0] + direct_d*PARAM.GRID - direct_u*PARAM.GRID, 
+                          head[1] + direct_l*PARAM.GRID - direct_r*PARAM.GRID] 
+        danger_turn_l = p_snake_game.is_collision(turn_left_head)
+
+        food_r = 1 if ((head[0] - food[0]) < 0) else 0
+        food_l = 1 if ((head[0] - food[0]) >= 0) else 0
+        food_d = 1 if ((head[1] - food[1]) < 0) else 0
+        food_u = 1 if ((head[1] - food[1]) >= 0) else 0
+
+        return [danger_straight, danger_turn_r, danger_turn_l,
+                direct_r, direct_d, direct_l, direct_u,
+                food_r, food_d, food_l, food_u]
+    
+    def get_action(self, agi_state):
+        # based on state gotten from Agent.get_state
+        # return values (one-hot) = [is_straight, turn_right, turn_left]
+        result = [0, 0, 0]
+        
+        # before running N training games, use random action
+        self.epsilon = PARAM.N_GAME_CREATE - self.n_games
+        if random.randint(0, PARAM.N_GAME_CREATE*3) < self.epsilon:
+            move_idx = random.randint(0, len(result))
+            result[move_idx] = 1
+        else:
+            # Main Reinforcement-Learning Part
+            # torch tensor -> tf tensor 
+            ts_state = tf.Tensor(agi_state, shape=(1, 11), dtype=tf.float16)
+            prediction = self.model(ts_state)
+            move_idx = tf.keras.argmax(prediction).item()
+            result[move_idx] = 1
+        return result
+
+class Linear_QNet(tf.Module):
+    def __init__(self):
+        super().__init__()
+
+class QTrainer:
+    def __init__(self):
+        self.lr = 0.001
 
 #####
 ##### Common Function between object in main 
@@ -242,7 +328,7 @@ if __name__ == "__main__":
 
         if (not is_game_over) & (not is_exit_game) & p_game.gameRun:
             p_game.update_snake_food_human(cur_direct)
-            is_game_over = p_game.is_collision()
+            is_game_over = p_game.is_collision(p_game.snakeBody[0])
             p_game.gameOver = is_game_over
             p_game.gameRun = not is_game_over
 
