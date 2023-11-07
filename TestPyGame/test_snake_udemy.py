@@ -1,6 +1,7 @@
 import pygame, sys, random, time
 from enum import Enum 
 
+
 import random
 import numpy as np
 import tensorflow as tf
@@ -296,6 +297,61 @@ def trans_key_event_to_direct(event):
     if (event.key == pygame.K_DOWN) | (event.key == ord('s')):
         result = Direct.DOWN
     return result
+
+def trans_agi_move_to_direct(p_game, agi_move):
+    #[straight, turn right, turn left]
+    all_direct = [v for v in Direct]
+    nxt_direct_turn_left = (p_game.snakeDirect.value - 1) % len(all_direct)
+    nxt_direct_turn_right = (p_game.snakeDirect.value + 1) % len(all_direct)
+
+    if agi_move[1] == 1:
+        # turn right : v + 1
+        return all_direct[nxt_direct_turn_right]
+    elif agi_move[2] == 1:
+        # turn left : v - 1
+        return all_direct[nxt_direct_turn_left]
+    return p_game.snakeDirect
+
+
+    if (event.key == pygame.K_RIGHT) | (event.key == ord('d')):
+        result = Direct.RIGHT
+    if (event.key == pygame.K_LEFT) | (event.key == ord('a')):
+        result = Direct.LEFT
+    if (event.key == pygame.K_UP) | (event.key == ord('w')):
+        result = Direct.UP
+    if (event.key == pygame.K_DOWN) | (event.key == ord('s')):
+        result = Direct.DOWN
+    return result
+
+def agent_train():
+    p_agent = Agent()
+    p_game = snakeGame()
+    is_game_over = 0
+    is_exit_game = False
+    highest_score = 0
+    score_all = []
+    prev_score = 0
+    reward = 0
+    while not is_exit_game:
+        state_prev = p_agent.get_state(p_game)
+        agi_move = p_agent.get_action(state_prev)
+        p_game.update_snake_food_human(trans_agi_move_to_direct(agi_move))
+        is_game_over = 1 if p_game.is_collision(p_game.snakeBody[0]) else 0
+        cur_score = p_game.score
+        if is_game_over == 1:
+            reward = -10
+        elif cur_score > prev_score:
+            reward = 10
+            prev_score = cur_score
+        else:
+            reward = 0
+        state_new = p_agent.get_state(p_game)
+        p_agent.remember()
+
+
+
+
+
 
 if __name__ == "__main__":
     p_game = snakeGame()
