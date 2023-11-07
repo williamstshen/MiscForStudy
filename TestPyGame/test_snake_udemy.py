@@ -1,6 +1,6 @@
 import pygame, sys, random, time
 from enum import Enum 
-
+from collections import deque
 
 import random
 import numpy as np
@@ -38,6 +38,7 @@ class PARAM:
     BROWN_COLOR = pygame.Color(165, 42, 42)
 
     N_GAME_CREATE = 100
+    MAX_MEMORY = 100000
 
 #####
 ##### game main Class include UI
@@ -207,6 +208,7 @@ class Agent:
         self.epsilon = PARAM.N_GAME_CREATE
         self.model = Linear_QNet()
         self.trainer = QTrainer()
+        self.memory = deque(maxlen=PARAM.MAX_MEMORY)
 
     
     def get_state(self, p_snake_game):
@@ -273,14 +275,53 @@ class Agent:
             move_idx = tf.keras.argmax(prediction).item()
             result[move_idx] = 1
         return result
+    
+    def save_data(self, state_prev, agi_move, state_next, reward, is_game_over):
+        self.memory.append((state_prev, agi_move, state_next, reward, is_game_over))
+
+    def train_short_memory(self, state_prev, agi_move, state_next, reward, is_game_over):
+        self.trainer.train_step(state_prev, agi_move, state_next, reward, is_game_over)
+        pass
+    def train_long_memory():
+        pass
+
 
 class Linear_QNet(tf.Module):
     def __init__(self):
         super().__init__()
 
 class QTrainer:
-    def __init__(self):
+    def __init__(self, model):
         self.lr = 0.001
+        self.model = model
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
+
+    def train_step(self, state_prev, agi_move, state_next, reward, is_game_over):
+        state_prev_tf = tf.Tensor(state_prev, dtype=tf.float16)
+        state_next_tf = tf.Tensor(state_prev, dtype=tf.float16)
+        agi_move_tf = tf.Tensor(state_prev, dtype=tf.int16)
+        reward_prev_tf = tf.Tensor(state_prev, dtype=tf.float16)
+        is_game_over_local = is_game_over
+        if len(state_prev) <= 1:
+            # translate to (1, x)
+            # tf.exapnded_dims = torch.unsqueeze
+            state_prev_tf = tf.expand_dims(state_prev_tf, axis=0)
+            state_next_tf = tf.expand_dims(state_next_tf, axis=0)
+            agi_move_tf = tf.expand_dims(agi_move_tf, axis=0)
+            reward_prev_tf = tf.expand_dims(reward_prev_tf, axis=0)
+            is_game_over_local = (is_game_over_local, )
+        
+        pred = self.model(state_prev_tf)
+        target = pred.clone()
+        ##TODO: belows are pytorch, need to realize and translate to tensorflow basic
+        self.optimizer.zero_grad()
+        loss = self.criterion(target, pred)
+        loss.backward()
+
+        self.optimizer.step()
+        
+
+
 
 #####
 ##### Common Function between object in main 
@@ -332,6 +373,7 @@ def agent_train():
     score_all = []
     prev_score = 0
     reward = 0
+
     while not is_exit_game:
         state_prev = p_agent.get_state(p_game)
         agi_move = p_agent.get_action(state_prev)
@@ -346,7 +388,27 @@ def agent_train():
         else:
             reward = 0
         state_new = p_agent.get_state(p_game)
-        p_agent.remember()
+        
+        # middle train with state/action between steps
+        p_agent.train_short_memory()
+
+        p_agent.save_data(state_prev, agi_move, reward, state_new, is_game_over)
+
+        if is_game_over == 1:
+            p_game.reset()
+            p_agent.n_games += 1
+            # train again with random pick existed database 
+            # for next games
+            p_agent.train_long_memory()
+            if cur_score > highest_score:
+                highest_score = cur_score
+                p_agent.model.save()
+            score_all.append(cur_score)
+            p_game.gameRun = True
+            p_game.gameOver = False
+            prev_score = 0
+            
+
 
 
 
