@@ -1,10 +1,15 @@
-import pygame, sys, random, time
+import pygame, sys, random, time, os
 from enum import Enum 
 from collections import deque
 
 import random
 import numpy as np
 import tensorflow as tf
+
+#####
+##### This is a basic Reinforcement Learning (RL) Test with snake Game
+##### try to write as template for other RL applications
+#####
 
 
 check_errors = pygame.init()
@@ -39,6 +44,7 @@ class PARAM:
 
     N_GAME_CREATE = 100
     MAX_MEMORY = 100000
+    BATCH_SIZE = 1000
 
 #####
 ##### game main Class include UI
@@ -207,7 +213,7 @@ class Agent:
         self.n_games = 0
         self.epsilon = PARAM.N_GAME_CREATE
         self.model = Linear_QNet()
-        self.trainer = QTrainer()
+        self.trainer = QTrainer(self.model)
         self.memory = deque(maxlen=PARAM.MAX_MEMORY)
 
     
@@ -264,14 +270,16 @@ class Agent:
         
         # before running N training games, use random action
         self.epsilon = PARAM.N_GAME_CREATE - self.n_games
-        if random.randint(0, PARAM.N_GAME_CREATE*3) < self.epsilon:
-            move_idx = random.randint(0, len(result))
+        if random.randint(0, PARAM.N_GAME_CREATE - 1) < self.epsilon:
+            move_idx = random.randint(0, len(result)-1)
             result[move_idx] = 1
         else:
             # Main Reinforcement-Learning Part
             # torch tensor -> tf tensor 
-            ts_state = tf.Tensor(agi_state, shape=(1, 11), dtype=tf.float16)
-            prediction = self.model(ts_state)
+            ts_state = tf.convert_to_tensor(agi_state, dtype=tf.float32)
+            print(type(ts_state))
+            print(ts_state.shape)
+            prediction = self.model.predict(ts_state)
             move_idx = tf.keras.argmax(prediction).item()
             result[move_idx] = 1
         return result
@@ -281,28 +289,57 @@ class Agent:
 
     def train_short_memory(self, state_prev, agi_move, state_next, reward, is_game_over):
         self.trainer.train_step(state_prev, agi_move, state_next, reward, is_game_over)
-        pass
-    def train_long_memory():
-        pass
+        
+    def train_long_memory(self):
+        mini_sample = self.memory
+        if len(self.memory) > PARAM.BATCH_SIZE:
+            mini_sample = random.sample(self.memory, PARAM.BATCH_SIZE)
+        state_prev, agi_move, state_next, reward, is_game_over = zip(*mini_sample)
+        self.trainer.train_step(state_prev, agi_move, state_next, reward, is_game_over)
 
 
-class Linear_QNet(tf.Module):
+
+class Linear_QNet():
     def __init__(self):
         super().__init__()
+        
+        self.model = tf.keras.models.Sequential()
+        self.model.add(tf.keras.layers.Dense(11, activation="relu", input_shape=(11,)))
+        self.model.add(tf.keras.layers.Dense(256, activation="relu"))
+        self.model.add(tf.keras.layers.Dense(3, activation="softmax"))
+        #self.layer = tf.keras.Model(inputs=self.inputs, outputs=self.action_layer)
+
+    def predict(self, x):
+        return self.model.predict(x)
+    
+    def save(self, file_name='model.pth'):
+        model_folder_path = './model'
+        if not os.path.exists(model_folder_path):
+            os.makedirs(model_folder_path)
+
+        file_name = os.path.join(model_folder_path, file_name)
+        tf.keras.Model.save(self.state_dict(), file_name)
+
+    #def forward(self, x):
+    #    #x_2 = tf.keras.layers.Dense(256, activation="relu")(x)
+    #    #x_3 = tf.keras.layers.Dense(3, activation="relu")(x_2)
+    #    return selfself.action_layer(x)
 
 class QTrainer:
     def __init__(self, model):
         self.lr = 0.001
         self.model = model
-        self.optimizer = tf.keras.optimizers.Adam(learning_rate=self.lr)
+        self.optimizer = tf.keras.optimizers.legacy.Adam(learning_rate=self.lr)
 
     def train_step(self, state_prev, agi_move, state_next, reward, is_game_over):
-        state_prev_tf = tf.Tensor(state_prev, dtype=tf.float16)
-        state_next_tf = tf.Tensor(state_prev, dtype=tf.float16)
-        agi_move_tf = tf.Tensor(state_prev, dtype=tf.int16)
-        reward_prev_tf = tf.Tensor(state_prev, dtype=tf.float16)
+        state_prev_tf = tf.convert_to_tensor(state_prev, dtype=tf.float16)
+        state_next_tf = tf.convert_to_tensor(state_next, dtype=tf.float16)
+        agi_move_tf = tf.convert_to_tensor(agi_move, dtype=tf.int16)
+        reward_prev_tf = tf.convert_to_tensor(reward, dtype=tf.float16)
         is_game_over_local = is_game_over
-        if len(state_prev) <= 1:
+        print(state_prev_tf)
+
+        if len(state_prev_tf.shape) == 1:
             # translate to (1, x)
             # tf.exapnded_dims = torch.unsqueeze
             state_prev_tf = tf.expand_dims(state_prev_tf, axis=0)
@@ -310,18 +347,21 @@ class QTrainer:
             agi_move_tf = tf.expand_dims(agi_move_tf, axis=0)
             reward_prev_tf = tf.expand_dims(reward_prev_tf, axis=0)
             is_game_over_local = (is_game_over_local, )
+
+        pred = self.model.predict(state_prev_tf)
+        print(pred)
+        target = pred ; # pred.clone()
+        ## Belows are pytorch, need to realize and translate to tensorflow basic
+        #loss = tf.keras.losses.MeanSquaredError(target, pred) 
+        loss = tf.keras.losses.MeanSquaredError() 
+
+        grads = tf.GradientTape(persistent=True).gradient(loss, self.model.model.trainable_variables)
+        self.optimizer.apply_gradients(zip(grads, self.model.model.trainable_variables))
+        #torch
+        #loss = self.criterion(target, pred)
+        #loss.backward()
+        #self.optimizer.step()
         
-        pred = self.model(state_prev_tf)
-        target = pred.clone()
-        ##TODO: belows are pytorch, need to realize and translate to tensorflow basic
-        self.optimizer.zero_grad()
-        loss = self.criterion(target, pred)
-        loss.backward()
-
-        self.optimizer.step()
-        
-
-
 
 #####
 ##### Common Function between object in main 
@@ -354,16 +394,6 @@ def trans_agi_move_to_direct(p_game, agi_move):
     return p_game.snakeDirect
 
 
-    if (event.key == pygame.K_RIGHT) | (event.key == ord('d')):
-        result = Direct.RIGHT
-    if (event.key == pygame.K_LEFT) | (event.key == ord('a')):
-        result = Direct.LEFT
-    if (event.key == pygame.K_UP) | (event.key == ord('w')):
-        result = Direct.UP
-    if (event.key == pygame.K_DOWN) | (event.key == ord('s')):
-        result = Direct.DOWN
-    return result
-
 def agent_train():
     p_agent = Agent()
     p_game = snakeGame()
@@ -377,11 +407,13 @@ def agent_train():
     while not is_exit_game:
         state_prev = p_agent.get_state(p_game)
         agi_move = p_agent.get_action(state_prev)
-        p_game.update_snake_food_human(trans_agi_move_to_direct(agi_move))
+        p_game.update_snake_food_human(trans_agi_move_to_direct(p_game, agi_move))
         is_game_over = 1 if p_game.is_collision(p_game.snakeBody[0]) else 0
         cur_score = p_game.score
         if is_game_over == 1:
             reward = -10
+            p_game.gameOver = True
+            p_game.gameRun = False
         elif cur_score > prev_score:
             reward = 10
             prev_score = cur_score
@@ -390,9 +422,11 @@ def agent_train():
         state_new = p_agent.get_state(p_game)
         
         # middle train with state/action between steps
-        p_agent.train_short_memory()
+        p_agent.train_short_memory(state_prev, agi_move, reward, state_new, is_game_over)
 
         p_agent.save_data(state_prev, agi_move, reward, state_new, is_game_over)
+        
+        p_game.update_ui()
 
         if is_game_over == 1:
             p_game.reset()
@@ -407,6 +441,8 @@ def agent_train():
             p_game.gameRun = True
             p_game.gameOver = False
             prev_score = 0
+        if p_agent.n_games > 100:
+            is_exit_game == True
             
 
 
@@ -416,42 +452,49 @@ def agent_train():
 
 
 if __name__ == "__main__":
-    p_game = snakeGame()
-    is_exit_game = False
-    is_game_over = False
-    highest_score = 0
-    cur_direct = None
+    use_func = "man_play"
+    if len(sys.argv) > 1:
+        use_func = sys.argv[1]
+    
+    if use_func == "ai":
+        agent_train()
+    else:
+        p_game = snakeGame()
+        is_exit_game = False
+        is_game_over = False
+        highest_score = 0
+        cur_direct = None
 
-    while not is_exit_game:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print("Close Window Pressed and exit by force")
-                is_exit_game = True
-            elif event.type == pygame.KEYDOWN:
-                if is_game_over :
-                    if p_game.score > highest_score:
-                        highest_score = p_game.score
-                    if event.key==pygame.K_RETURN:
-                        is_game_over = False
-                        p_game.reset()
-                        p_game.gameRun = True
-                    elif event.key==pygame.K_ESCAPE:
-                        is_exit_game = True
-                else:
-                    if event.key==pygame.K_RETURN:
-                        p_game.gameRun = True
-                    new_direct = trans_key_event_to_direct(event)
-                    if new_direct is not None:
-                        cur_direct = new_direct
-
-        if (not is_game_over) & (not is_exit_game) & p_game.gameRun:
-            p_game.update_snake_food_human(cur_direct)
-            is_game_over = p_game.is_collision(p_game.snakeBody[0])
-            p_game.gameOver = is_game_over
-            p_game.gameRun = not is_game_over
-
-        p_game.update_ui()
-
+        while not is_exit_game:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    print("Close Window Pressed and exit by force")
+                    is_exit_game = True
+                elif event.type == pygame.KEYDOWN:
+                    if is_game_over :
+                        if p_game.score > highest_score:
+                            highest_score = p_game.score
+                        if event.key==pygame.K_RETURN:
+                            is_game_over = False
+                            p_game.reset()
+                            p_game.gameRun = True
+                        elif event.key==pygame.K_ESCAPE:
+                            is_exit_game = True
+                    else:
+                        if event.key==pygame.K_RETURN:
+                            p_game.gameRun = True
+                        new_direct = trans_key_event_to_direct(event)
+                        if new_direct is not None:
+                            cur_direct = new_direct
+    
+            if (not is_game_over) & (not is_exit_game) & p_game.gameRun:
+                p_game.update_snake_food_human(cur_direct)
+                is_game_over = p_game.is_collision(p_game.snakeBody[0])
+                p_game.gameOver = is_game_over
+                p_game.gameRun = not is_game_over
+    
+            p_game.update_ui()
+    
     #exit pygame
     pygame.quit()
     print(f"Exit Game with Highest Score={highest_score}")
